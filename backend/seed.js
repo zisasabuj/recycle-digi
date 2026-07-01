@@ -71,7 +71,7 @@ async function main() {
     prisma.auction.create({ data: {
       sellerId: user1.id, title: 'Samsung Galaxy S22 Ultra — Excellent Condition',
       description: 'Used for 6 months. No scratches. Original box + charger. Battery 96%. 256GB.',
-      images: JSON.stringify(['/uploads/phone-samsung.jpg']),
+      images: JSON.stringify(['https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400']),
       category: 'Phones', condition: 'USED', sellType: 'AUCTION',
       basePrice: 45000, bidIncrement: 500, currentMaxBid: 48500,
       city: 'Dhaka', area: 'Gulshan', endsAt: h(18), viewCount: 142, status: 'ACTIVE'
@@ -80,7 +80,7 @@ async function main() {
     prisma.auction.create({ data: {
       sellerId: user1.id, title: 'MacBook Pro M1 14" — Brand New Sealed',
       description: 'Factory sealed. 16GB RAM, 512GB SSD. Full Apple warranty.',
-      images: JSON.stringify(['/uploads/laptop-macbook.jpg']),
+      images: JSON.stringify(['https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400']),
       category: 'Laptops', condition: 'NEW', sellType: 'DIRECT',
       basePrice: 185000, bidIncrement: 0, currentMaxBid: 0,
       city: 'Dhaka', area: 'Dhanmondi', endsAt: h(720), viewCount: 89, status: 'ACTIVE'
@@ -89,7 +89,7 @@ async function main() {
     prisma.auction.create({ data: {
       sellerId: user2.id, title: 'Canon EOS R50 Camera Kit',
       description: 'Used for one photoshoot. 18-45mm + 50mm prime. Extra battery + 128GB card.',
-      images: JSON.stringify(['/uploads/camera-canon.jpg']),
+      images: JSON.stringify(['https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400']),
       category: 'Cameras', condition: 'USED', sellType: 'AUCTION',
       basePrice: 65000, bidIncrement: 1000, currentMaxBid: 67000,
       city: 'Chittagong', area: 'Agrabad', endsAt: h(6), viewCount: 203, status: 'ACTIVE'
@@ -98,7 +98,7 @@ async function main() {
     prisma.auction.create({ data: {
       sellerId: user2.id, title: 'Apple Watch Series 9 — 45mm GPS New',
       description: 'Brand new, sealed box. Midnight aluminum. Full warranty.',
-      images: JSON.stringify(['/uploads/watch-apple.jpg']),
+      images: JSON.stringify(['https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400']),
       category: 'Watches', condition: 'NEW', sellType: 'DIRECT',
       basePrice: 42000, bidIncrement: 0, currentMaxBid: 0,
       city: 'Dhaka', area: 'Uttara', endsAt: h(720), viewCount: 67, status: 'ACTIVE'
@@ -107,7 +107,7 @@ async function main() {
     prisma.auction.create({ data: {
       sellerId: user1.id, title: 'Sony WH-1000XM5 Headphones — Like New',
       description: 'Used 2 weeks. Perfect condition. Noise cancelling. Box included.',
-      images: JSON.stringify(['/uploads/headphone-sony.jpg']),
+      images: JSON.stringify(['https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400']),
       category: 'Electronics', condition: 'USED', sellType: 'DIRECT',
       basePrice: 22000, bidIncrement: 0, currentMaxBid: 0,
       city: 'Dhaka', area: 'Banani', endsAt: h(720), viewCount: 55, status: 'ACTIVE'
@@ -116,7 +116,7 @@ async function main() {
     prisma.auction.create({ data: {
       sellerId: user2.id, title: 'Dell XPS 15 — i7 12th Gen, 32GB RAM',
       description: 'Used 1 year. Excellent. 1TB NVMe, RTX 3050Ti. Great for devs.',
-      images: JSON.stringify(['/uploads/laptop-dell.jpg']),
+      images: JSON.stringify(['https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400']),
       category: 'Laptops', condition: 'USED', sellType: 'AUCTION',
       basePrice: 95000, bidIncrement: 1000, currentMaxBid: 99000,
       city: 'Sylhet', area: 'Zindabazar', endsAt: h(24), viewCount: 110, status: 'ACTIVE'
@@ -125,7 +125,7 @@ async function main() {
     prisma.auction.create({ data: {
       sellerId: user1.id, title: 'iPhone 15 Pro — 256GB Natural Titanium',
       description: 'Brand new, sealed. AppleCare+ included. USB-C cable + clear case.',
-      images: JSON.stringify(['/uploads/phone-iphone.jpg']),
+      images: JSON.stringify(['https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=400']),
       category: 'Phones', condition: 'NEW', sellType: 'DIRECT',
       basePrice: 145000, bidIncrement: 0, currentMaxBid: 0,
       city: 'Dhaka', area: 'Bashundhara', endsAt: h(720), viewCount: 318, status: 'ACTIVE'
@@ -134,7 +134,7 @@ async function main() {
     prisma.auction.create({ data: {
       sellerId: user2.id, title: 'DJI Mini 4 Pro Drone — Fly More Combo',
       description: 'Flown 3 times. Extra batteries. No damage. 47 min total flight.',
-      images: JSON.stringify(['/uploads/drone-dji.jpg']),
+      images: JSON.stringify(['https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=400']),
       category: 'Electronics', condition: 'USED', sellType: 'AUCTION',
       basePrice: 55000, bidIncrement: 1000, currentMaxBid: 58000,
       city: 'Rajshahi', area: 'Boalia', endsAt: h(30), viewCount: 77, status: 'ACTIVE'
