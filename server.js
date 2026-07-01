@@ -9,34 +9,6 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 const app    = express();
-const server = http.createServer(app);
-
-// ── Socket.IO (real-time bids + chat) ──
-const io = new Server(server, { cors: { origin: '*' } });
-global.io = io;
-
-io.use(async (socket, next) => {
-  const token = socket.handshake.auth?.token;
-  if (token) {
-    try {
-      const d = jwt.verify(token, process.env.JWT_SECRET);
-      socket.userId = d.id;
-    } catch {}
-  }
-  next();
-});
-
-io.on('connection', (socket) => {
-  // Join auction room (for live bid updates)
-  socket.on('join_auction', (auctionId) => {
-    socket.join(auctionId);
-  });
-  // Join chat room
-  socket.on('join_chat', (chatId) => {
-    socket.join(chatId);
-  });
-  socket.on('disconnect', () => {});
-});
 
 // ── Middleware ──
 app.use(cors({ origin: '*', credentials: true }));
@@ -65,7 +37,7 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-// ── Seed Endpoint (for Render deploy) ──
+// ── Seed Endpoint (for Vercel/Render deploy) ──
 app.get('/api/seed', async (req, res) => {
   try {
     const { execSync } = require('child_process');
@@ -76,18 +48,18 @@ app.get('/api/seed', async (req, res) => {
   }
 });
 
-// ── Auto-expire auctions (runs every 5 min) ──
-setInterval(async () => {
+// ── Manual Trigger for Auto-expire (Vercel Friendly) ──
+app.get('/api/expire-check', async (req, res) => {
   try {
     const expired = await prisma.auction.updateMany({
       where: { status: 'ACTIVE', endsAt: { lt: new Date() } },
       data:  { status: 'EXPIRED' }
     });
-    if (expired.count > 0) {
-      console.log(`⏰ Auto-expired ${expired.count} auction(s)`);
-    }
-  } catch {}
-}, 5 * 60 * 1000);
+    res.json({ success: true, message: `⏰ Expired ${expired.count} auction(s)` });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 // ── SPA fallback ──
 app.get('*', (req, res) => {
@@ -100,13 +72,43 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ success: false, message: err.message });
 });
 
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  console.log('\n╔══════════════════════════════════════════════╗');
-  console.log(`║  🛒  Recycle-Digi  →  http://localhost:${PORT}   ║`);
-  console.log('╠══════════════════════════════════════════════╣');
-  console.log('║  Admin   admin@recycledigi.com / admin123    ║');
-  console.log('║  Seller  rahim@example.com     / seller123   ║');
-  console.log('║  Buyer   sumon@example.com     / buyer123    ║');
-  console.log('╚══════════════════════════════════════════════╝\n');
-});
+// ── Vercel Support vs Local Server Implementation ──
+if (process.env.NODE_ENV !== 'production') {
+  const server = http.createServer(app);
+  const io = new Server(server, { cors: { origin: '*' } });
+  global.io = io;
+
+  io.use(async (socket, next) => {
+    const token = socket.handshake.auth?.token;
+    if (token) {
+      try {
+        const d = jwt.verify(token, process.env.JWT_SECRET);
+        socket.userId = d.id;
+      } catch {}
+    }
+    next();
+  });
+
+  io.on('connection', (socket) => {
+    socket.on('join_auction', (auctionId) => { socket.join(auctionId); });
+    socket.on('join_chat', (chatId) => { socket.join(chatId); });
+  });
+
+  // Local auto-expire timer (only runs locally)
+  setInterval(async () => {
+    try {
+      await prisma.auction.updateMany({
+        where: { status: 'ACTIVE', endsAt: { lt: new Date() } },
+        data:  { status: 'EXPIRED' }
+      });
+    } catch {}
+  }, 5 * 60 * 1000);
+
+  const PORT = process.env.PORT || 5000;
+  server.listen(PORT, () => {
+    console.log(`\n🛒 Recycle-Digi local server running on → http://localhost:${PORT}\n`);
+  });
+}
+
+// Export app for Vercel Serverless
+module.exports = app;
