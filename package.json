@@ -4,7 +4,7 @@
   "description": "Recycle BD Auction Platform — Digi Store Theme",
   "main": "server.js",
   "scripts": {
-    "start": "npx prisma generate && npx prisma db push && node server.js",
+    "start": "npx prisma generate && npx prisma db push && node backend/seed.js && node server.js",
     "dev": "nodemon server.js",
     "build": "npx prisma generate && npx prisma db push",
     "db:push": "npx prisma db push",
