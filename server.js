@@ -65,6 +65,17 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
+// ── Seed Endpoint (for Render deploy) ──
+app.get('/api/seed', async (req, res) => {
+  try {
+    const { execSync } = require('child_process');
+    execSync('node backend/seed.js', { cwd: __dirname, timeout: 30000 });
+    res.json({ success: true, message: 'Database seeded successfully! 🌱' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // ── Auto-expire auctions (runs every 5 min) ──
 setInterval(async () => {
   try {
