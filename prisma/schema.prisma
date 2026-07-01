@@ -1,0 +1,148 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String    @id @default(uuid())
+  username     String    @unique
+  email        String    @unique
+  passwordHash String
+  role         String    @default("USER")   // USER | ADMIN
+  fullName     String    @default("")
+  phone        String    @default("")
+  address      String    @default("")
+  createdAt    DateTime  @default(now())
+
+  auctions     Auction[]
+  bids         Bid[]
+  watchlist    Watchlist[]
+  cartItems    CartItem[]
+  buyerOrders  Order[]   @relation("BuyerOrders")
+  sellerOrders Order[]   @relation("SellerOrders")
+  sellerChats  Chat[]    @relation("SellerChats")
+  winnerChats  Chat[]    @relation("WinnerChats")
+  messages     ChatMessage[]
+  notifications Notification[]
+}
+
+model Auction {
+  id            String    @id @default(uuid())
+  sellerId      String
+  title         String
+  description   String
+  images        String    @default("[]")   // JSON array
+  category      String
+  condition     String    @default("USED") // NEW | USED
+  sellType      String    @default("DIRECT") // DIRECT | AUCTION
+  basePrice     Float
+  bidIncrement  Float     @default(50)
+  currentMaxBid Float     @default(0)
+  status        String    @default("ACTIVE") // DRAFT | ACTIVE | EXPIRED | SOLD
+  city          String    @default("Dhaka")
+  area          String    @default("")
+  endsAt        DateTime
+  createdAt     DateTime  @default(now())
+  viewCount     Int       @default(0)
+
+  seller        User      @relation(fields: [sellerId], references: [id])
+  bids          Bid[]
+  watchlist     Watchlist[]
+  cartItems     CartItem[]
+  orders        Order[]
+  chat          Chat?
+}
+
+model Bid {
+  id        String   @id @default(uuid())
+  auctionId String
+  userId    String
+  amount    Float
+  isSealed  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  auction   Auction  @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Watchlist {
+  id        String   @id @default(uuid())
+  userId    String
+  auctionId String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  auction   Auction  @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, auctionId])
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  userId    String
+  auctionId String
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  auction   Auction  @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, auctionId])
+}
+
+model Order {
+  id          String   @id @default(uuid())
+  buyerId     String
+  sellerId    String
+  auctionId   String
+  amount      Float
+  status      String   @default("PENDING") // PENDING | CONFIRMED | SHIPPED | DELIVERED | CANCELLED
+  address     String   @default("")
+  phone       String   @default("")
+  note        String   @default("")
+  createdAt   DateTime @default(now())
+
+  buyer       User     @relation("BuyerOrders", fields: [buyerId], references: [id])
+  seller      User     @relation("SellerOrders", fields: [sellerId], references: [id])
+  auction     Auction  @relation(fields: [auctionId], references: [id])
+}
+
+model Chat {
+  id        String   @id @default(uuid())
+  auctionId String   @unique
+  sellerId  String
+  winnerId  String
+  createdAt DateTime @default(now())
+
+  auction   Auction      @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+  seller    User         @relation("SellerChats", fields: [sellerId], references: [id])
+  winner    User         @relation("WinnerChats", fields: [winnerId], references: [id])
+  messages  ChatMessage[]
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  chatId    String
+  senderId  String
+  text      String
+  createdAt DateTime @default(now())
+
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender    User     @relation(fields: [senderId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String
+  message   String
+  read      Boolean  @default(false)
+  auctionId String?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RecycleBD — Sealed Bid Auctions Bangladesh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/mobile-nav.css">
+</head>
+<body>
+
+<div id="toast-container"></div>
+
+<!-- ══ TOPBAR ══ -->
+<div class="topbar">
+  <div class="container">
+    <div class="topbar-left">
+      <span class="topbar-dot"></span>
+      <span>🇧🇩 Bangladesh's #1 Marketplace & Auction Platform</span>
+    </div>
+    <div>
+      <span id="tb-user" style="display:none">
+        Logged in as <strong id="tb-name" style="color:#e2e8f0"></strong> ·
+        <a href="#" onclick="nav('notifications')">Notifications</a> ·
+        <a href="#" onclick="logout()">Sign out</a>
+      </span>
+      <span id="tb-guest">
+        <a href="#" onclick="openAuth('login')">Sign In</a> ·
+        <a href="#" onclick="openAuth('register')">Create Account</a>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HEADER ══ -->
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="#" class="logo" onclick="nav('home')">
+      <div class="logo-icon">♻️</div>
+      <div>
+        <span class="logo-text">Recycle<span>BD</span></span>
+        <span class="logo-pill">AUCTIONS</span>
+      </div>
+    </a>
+    <div class="search-wrap">
+      <input type="text" id="search-input" placeholder="Search phones, laptops, cameras...">
+      <select id="search-cat">
+        <option value="">All Categories</option>
+        <option>Electronics</option><option>Phones</option><option>Laptops</option>
+        <option>Cameras</option><option>Watches</option><option>Accessories</option>
+        <option>Furniture</option><option>Clothing</option><option>Sports</option><option>Books</option>
+      </select>
+      <button class="search-btn" onclick="doSearch()">🔍 Search</button>
+    </div>
+    <div class="header-icons">
+      <button class="icon-btn" onclick="nav('watchlist')" title="Watchlist">❤️</button>
+      <div style="position:relative">
+        <button class="icon-btn" id="notif-btn" onclick="toggleNotifPanel()" title="Notifications">
+          🔔<span class="badge" id="notif-badge" style="display:none">0</span>
+        </button>
+        <div class="notif-dropdown" id="notif-panel">
+          <div class="notif-dropdown-head">
+            <span>🔔 Notifications</span>
+            <button onclick="markAllRead()">Mark all read</button>
+          </div>
+          <div id="notif-list"><div class="notif-empty">Loading...</div></div>
+        </div>
+      </div>
+      <button class="icon-btn" onclick="nav('chats')" title="Messages">💬</button>
+      <button class="icon-btn" onclick="nav('cart')" title="Cart" style="position:relative">
+        🛒<span class="badge" id="cart-badge" style="display:none">0</span>
+      </button>
+      <div id="header-user-area">
+        <button class="icon-btn" onclick="openAuth('login')" id="header-login-btn" title="Sign In">👤</button>
+        <div class="header-user-btn" id="header-user-btn" style="display:none" onclick="nav('dashboard')">
+          <div class="user-avatar" id="header-avatar">?</div>
+          <span class="user-name" id="header-uname">Account</span>
+        </div>
+      </div>
+      <button class="icon-btn hamburger" id="hamburger-btn" onclick="toggleMobileNav()" title="Menu">☰</button>
+    </div>
+  </div>
+</header>
+
+<!-- ══ NAV ══ -->
+<nav class="site-nav">
+  <div class="container">
+    <div class="nav-inner">
+      <a class="nav-link active" id="nl-home" onclick="nav('home')">🏠 Home</a>
+      <div class="nav-divider"></div>
+      <a class="nav-link" id="nl-watchlist" onclick="nav('watchlist')">❤️ Watchlist</a>
+      <a class="nav-link" id="nl-bids" onclick="nav('bids')">💰 My Bids</a>
+      <a class="nav-link" id="nl-cart" onclick="nav('cart')">🛒 Cart</a>
+      <a class="nav-link" id="nl-orders" onclick="nav('orders')">📦 My Orders</a>
+      <a class="nav-link" id="nl-dashboard" onclick="nav('dashboard')" style="display:none">📊 Dashboard</a>
+      <div class="nav-divider"></div>
+      <a class="nav-link sell" onclick="openSellForm()">+ Sell Item</a>
+      <a class="nav-link" id="nl-chats" onclick="nav('chats')">💬 Chats</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ MOBILE NAV OVERLAY ══ -->
+<div class="mobile-nav-overlay" id="mobile-nav-overlay" onclick="toggleMobileNav()"></div>
+<div class="mobile-nav-panel" id="mobile-nav-panel">
+  <div class="mobile-nav-head">
+    <span>♻️ RecycleBD</span>
+    <button onclick="toggleMobileNav()" class="mobile-nav-close">✕</button>
+  </div>
+  <div class="mobile-nav-links">
+    <a onclick="nav('home');toggleMobileNav()">🏠 Home</a>
+    <a onclick="nav('watchlist');toggleMobileNav()">❤️ Watchlist</a>
+    <a onclick="nav('bids');toggleMobileNav()">💰 My Bids</a>
+    <a onclick="nav('cart');toggleMobileNav()">🛒 Cart</a>
+    <a onclick="nav('orders');toggleMobileNav()">📦 My Orders</a>
+    <a onclick="nav('dashboard');toggleMobileNav()">📊 Dashboard</a>
+    <a onclick="nav('chats');toggleMobileNav()">💬 Chats</a>
+    <div class="mobile-nav-divider"></div>
+    <a onclick="openSellForm();toggleMobileNav()" class="sell">+ Sell Item</a>
+    <a onclick="nav('notifications');toggleMobileNav()">🔔 Notifications</a>
+  </div>
+</div>
+
+<!-- ══ HOME VIEW ══ -->
+<div id="view-home" class="view active">
+  <!-- Hero -->
+  <section class="hero-section">
+    <div class="hero-bg">
+      <div class="hero-orb hero-orb-1"></div>
+      <div class="hero-orb hero-orb-2"></div>
+      <div class="hero-orb hero-orb-3"></div>
+    </div>
+    <div class="container">
+      <div class="hero-grid">
+        <div>
+          <div class="hero-eyebrow anim-slide-in" style="animation-delay:.1s"><span></span> Bangladesh's Marketplace & Auction Platform</div>
+          <h1 class="hero-h1 anim-slide-in" style="animation-delay:.2s">Bid Smart.<br>Win <span class="grad">Amazing</span><br>Deals. 🏆</h1>
+          <p class="hero-sub anim-slide-in" style="animation-delay:.3s">Buy new items instantly or place confidential sealed bids on quality used electronics, gadgets & more. Fair, transparent, exciting.</p>
+          <div class="hero-cta anim-slide-in" style="animation-delay:.4s">
+            <button class="btn btn-primary btn-lg" onclick="nav('home')">🏷️ Browse Items</button>
+            <button class="btn btn-ghost btn-lg" onclick="openSellForm()">+ List Your Item</button>
+          </div>
+          <div class="hero-trust anim-slide-in" style="animation-delay:.5s">
+            <div class="hero-trust-item"><span class="ico">🔒</span><span>Sealed bids — <strong>100% private</strong></span></div>
+            <div class="hero-trust-item"><span class="ico">🛒</span><span><strong>Buy Now</strong> for new items</span></div>
+            <div class="hero-trust-item"><span class="ico">💬</span><span><strong>Winner chat</strong> included</span></div>
+            <div class="hero-trust-item"><span class="ico">৳</span><span>All prices in <strong>Taka</strong></span></div>
+          </div>
+        </div>
+        <div class="hero-cards">
+          <div class="hero-stat-card anim-pop" style="animation-delay:.3s"><div class="num" id="hs-auctions">—</div><div class="lbl">Active</div></div>
+          <div class="hero-stat-card anim-pop" style="animation-delay:.45s"><div class="num" id="hs-bids">—</div><div class="lbl">Total Bids</div></div>
+          <div class="hero-stat-card anim-pop" style="animation-delay:.6s"><div class="num">10</div><div class="lbl">Categories</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <div class="container filter-inner">
+      <select class="filter-select" id="home-cat" onchange="applyHomeFilters()">
+        <option value="">📂 All Categories</option>
+        <option>Electronics</option><option>Phones</option><option>Laptops</option>
+        <option>Cameras</option><option>Watches</option><option>Accessories</option>
+        <option>Furniture</option><option>Clothing</option><option>Sports</option><option>Books</option>
+      </select>
+      <select class="filter-select" id="home-cond" onchange="applyHomeFilters()">
+        <option value="">🏷️ Any Condition</option>
+        <option value="USED">Used</option><option value="NEW">New</option>
+      </select>
+      <select class="filter-select" id="home-city" onchange="updateAreaOptions('home-city','home-area');applyHomeFilters()">
+        <option value="">📍 Any City</option>
+        <option>Dhaka</option><option>Chittagong</option>
+        <option>Rajshahi</option><option>Khulna</option><option>Sylhet</option>
+      </select>
+      <select class="filter-select" id="home-area" onchange="applyHomeFilters()">
+        <option value="">🏘️ Any Area</option>
+      </select>
+      <div class="filter-sep"></div>
+      <button class="filter-pill selltype-pill active" id="st-all" onclick="setSellTypeFilter('')">All</button>
+      <button class="filter-pill selltype-pill" id="st-direct" onclick="setSellTypeFilter('DIRECT')">🛒 Buy Now</button>
+      <button class="filter-pill selltype-pill" id="st-auction" onclick="setSellTypeFilter('AUCTION')">🔨 Auction</button>
+      <div class="filter-sep"></div>
+      <button class="filter-pill ending" id="ending-toggle" onclick="toggleEndingSoon()">⏰ Ending Soon</button>
+      <select class="filter-select" id="home-sort" onchange="applyHomeFilters()">
+        <option value="endsAt|asc">⏳ Ending First</option>
+        <option value="createdAt|desc">🆕 Newest</option>
+        <option value="currentMaxBid|desc">💰 Highest Bid</option>
+        <option value="viewCount|desc">🔥 Most Viewed</option>
+        <option value="basePrice|asc">⬇️ Lowest Base</option>
+      </select>
+      <button class="filter-pill" onclick="clearFilters()" style="margin-left:auto">✕ Clear</button>
+      <span class="filter-count" id="home-result-count"></span>
+    </div>
+  </div>
+
+  <!-- Auctions Grid -->
+  <div class="container">
+    <div class="section-head">
+      <h2 id="home-section-title">Active Listings</h2>
+      <a onclick="nav('auctions')">View all →</a>
+    </div>
+    <div class="auctions-grid" id="home-auctions">
+      <div class="loading" style="grid-column:1/-1"><span class="spinner"></span> Loading auctions...</div>
+    </div>
+    <div class="pagination" id="home-pagination"></div>
+  </div>
+</div>
+
+<!-- ══ DETAIL VIEW ══ -->
+<div id="view-detail" class="view">
+  <div class="page-hero">
+    <div class="container page-hero-inner">
+      <div class="page-breadcrumb">
+        <a href="#" onclick="nav('home')">Home</a>
+        <span class="page-breadcrumb-sep">›</span>
+        <a href="#" onclick="nav('auctions')">Auctions</a>
+        <span class="page-breadcrumb-sep">›</span>
+        <span id="d-bc">...</span>
+      </div>
+      <h1 id="d-title">Loading...</h1>
+    </div>
+  </div>
+  <div class="container">
+    <div class="detail-grid" id="detail-content">
+      <div class="loading" style="grid-column:1/-1;padding:80px"><span class="spinner"></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SELL VIEW ══ -->
+<div id="view-sell" class="view">
+  <div class="page-hero">
+    <div class="container page-hero-inner">
+      <div class="page-breadcrumb"><a href="#" onclick="nav('home')">Home</a> <span class="page-breadcrumb-sep">›</span> <span>List an Item</span></div>
+      <h1>📦 List Your Item</h1>
+      <p>Your listing goes live immediately after submission.</p>
+    </div>
+  </div>
+  <div class="container">
+    <div class="sell-wrap">
+      <div id="sell-alert"></div>
+      <div class="sell-card">
+        <div class="sell-card-title"><span class="ico">📋</span> Item Details</div>
+        <div class="form-group">
+          <label class="form-label">Title *</label>
+          <input class="form-control" id="s-title" placeholder="e.g. Samsung Galaxy S22 Ultra — Excellent Condition">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Category *</label>
+            <select class="form-control" id="s-cat">
+              <option value="">Select category</option>
+              <option>Electronics</option><option>Phones</option><option>Laptops</option>
+              <option>Cameras</option><option>Watches</option><option>Accessories</option>
+              <option>Furniture</option><option>Clothing</option><option>Sports</option><option>Books</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Condition *</label>
+            <select class="form-control" id="s-cond" onchange="onConditionChange()">
+              <option value="USED">Used</option><option value="NEW">New / Sealed</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" id="selltype-group">
+          <label class="form-label">Sell Type *</label>
+          <select class="form-control" id="s-selltype" onchange="onSellTypeChange()">
+            <option value="AUCTION">🔨 Auction (Bidding)</option>
+            <option value="DIRECT">🛒 Direct Sale (Buy Now)</option>
+          </select>
+          <div class="form-hint">Auction: buyers place sealed bids. Direct Sale: fixed price, instant purchase.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description *</label>
+          <textarea class="form-control" id="s-desc" rows="4" placeholder="Describe condition, what's included, any defects, purchase date..."></textarea>
+        </div>
+      </div>
+      <div class="sell-card">
+        <div class="sell-card-title"><span class="ico">💰</span> Pricing & Duration</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Base Price (৳) *</label>
+            <input class="form-control" id="s-base" type="number" min="1" placeholder="e.g. 15000">
+            <div class="form-hint">Starting price / Buy now price</div>
+          </div>
+          <div class="form-group" id="increment-group">
+            <label class="form-label">Bid Increment (৳)</label>
+            <input class="form-control" id="s-increment" type="number" min="10" value="50">
+            <div class="form-hint">Minimum raise per bid (auction only)</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Auction End Date & Time *</label>
+          <input class="form-control" id="s-ends" type="datetime-local">
+        </div>
+      </div>
+      <div class="sell-card">
+        <div class="sell-card-title"><span class="ico">📍</span> Location</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">City *</label>
+            <select class="form-control" id="s-city" onchange="updateAreaOptions('s-city','s-area')">
+              <option value="Dhaka">Dhaka</option><option value="Chittagong">Chittagong</option>
+              <option value="Rajshahi">Rajshahi</option><option value="Khulna">Khulna</option>
+              <option value="Sylhet">Sylhet</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Area</label>
+            <select class="form-control" id="s-area">
+              <option value="">— Any area —</option>
+              <option>Gulshan</option><option>Dhanmondi</option><option>Mirpur</option>
+              <option>Uttara</option><option>Banani</option><option>Bashundhara</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="sell-card">
+        <div class="sell-card-title"><span class="ico">📷</span> Images (up to 5)</div>
+        <div class="upload-area" onclick="document.getElementById('img-file-input').click()" id="upload-area">
+          <span class="ico">🖼️</span>
+          <h4>Click to upload images</h4>
+          <p>JPG, PNG, WebP · Max 5MB each · Up to 5 images</p>
+          <div class="img-previews" id="image-previews"></div>
+        </div>
+        <input type="file" id="img-file-input" accept="image/*" multiple style="display:none" onchange="handleImageUpload(this)">
+        <div style="display:flex;gap:10px;margin-top:12px">
+          <input class="form-control" id="s-img-url" placeholder="Or paste image URL here" style="flex:1">
+          <button class="btn btn-ghost btn-sm" onclick="addImageUrl()">+ Add URL</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;padding-bottom:40px">
+        <button class="btn btn-primary btn-lg" onclick="submitAuction()" id="sell-btn">🚀 List Now</button>
+        <button class="btn btn-ghost btn-lg" onclick="nav('home')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CART VIEW ══ -->
+<div id="view-cart" class="view">
+  <div class="page-hero">
+    <div class="container page-hero-inner"><h1>🛒 Shopping Cart</h1><p>Review items before checkout</p></div>
+  </div>
+  <div class="container" style="padding:24px 20px;max-width:800px">
+    <div id="cart-content"><div class="loading"><span class="spinner"></span></div></div>
+  </div>
+</div>
+
+<!-- ══ ORDERS VIEW ══ -->
+<div id="view-orders" class="view">
+  <div class="page-hero">
+    <div class="container page-hero-inner"><h1>📦 My Orders</h1><p>Track your purchases</p></div>
+  </div>
+  <div class="container" style="padding:24px 20px;max-width:900px">
+    <div id="orders-content"><div class="loading"><span class="spinner"></span></div></div>
+  </div>
+</div>
+
+<!-- ══ SELLER ORDERS VIEW ══ -->
+<div id="view-seller-orders" class="view">
+  <div class="page-hero">
+    <div class="container page-hero-inner"><h1>📬 Received Orders</h1><p>Orders from your direct sale items</p></div>
+  </div>
+  <div class="container" style="padding:24px 20px;max-width:900px">
+    <div id="seller-orders-content"><div class="loading"><span class="spinner"></span></div></div>
+  </div>
+</div>
+
+<!-- ══ DASHBOARD VIEW ══ -->
+<div id="view-dashboard" class="view">
+  <div class="page-hero">
+    <div class="container page-hero-inner">
+      <h1>📊 Dashboard</h1>
+      <p>Manage your auctions and track performance</p>
+    </div>
+  </div>
+  <div class="container">
+    <div class="dashboard-layout">
+      <aside class="dash-sidebar">
+        <div class="dash-user-card">
+          <div class="dash-avatar" id="dash-av">👤</div>
+          <div class="dash-username" id="dash-username">—</div>
+          <div class="dash-role-pill" id="dash-role">—</div>
+        </div>
+        <div class="dash-nav-card">
+          <div class="dash-nav-item active" onclick="showDashTab('overview',this)"><span class="ico">🏠</span> Overview</div>
+          <div class="dash-nav-item" onclick="showDashTab('my-auctions',this)"><span class="ico">🏷️</span> My Auctions</div>
+          <div class="dash-nav-item" onclick="showDashTab('my-orders',this)"><span class="ico">📦</span> My Orders</div>
+          <div class="dash-nav-item" onclick="showDashTab('seller-orders',this)"><span class="ico">📬</span> Received Orders</div>
+          <div class="dash-nav-item" onclick="showDashTab('profile',this)"><span class="ico">👤</span> Edit Profile</div>
+          <div class="dash-nav-item" onclick="showDashTab('change-pw',this)"><span class="ico">🔑</span> Change Password</div>
+          <div class="dash-nav-item" onclick="nav('bids')"><span class="ico">💰</span> My Bids</div>
+          <div class="dash-nav-item" onclick="nav('watchlist')"><span class="ico">❤️</span> Watchlist</div>
+          <div class="dash-nav-item" onclick="nav('chats')"><span class="ico">💬</span> Chats</div>
+          <div class="dash-nav-item" onclick="logout()" style="border-top:1px solid var(--border);margin-top:4px"><span class="ico">🚪</span> Sign Out</div>
+        </div>
+      </aside>
+      <main>
+        <div class="dash-tab active" id="dtab-overview">
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-icon">🏷️</div><div class="stat-num" id="ds-total">—</div><div class="stat-lbl">Total Listings</div></div>
+            <div class="stat-card"><div class="stat-icon">🟢</div><div class="stat-num" id="ds-active">—</div><div class="stat-lbl">Active</div></div>
+            <div class="stat-card"><div class="stat-icon">🔒</div><div class="stat-num" id="ds-bids">—</div><div class="stat-lbl">Bids Received</div></div>
+            <div class="stat-card"><div class="stat-icon">👁️</div><div class="stat-num" id="ds-views">—</div><div class="stat-lbl">Total Views</div></div>
+          </div>
+          <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border)">
+              <h3 style="font-size:14px;font-weight:700;color:var(--text-1)">Recent Listings</h3>
+              <button class="btn btn-primary btn-sm" onclick="openSellForm()">+ New Listing</button>
+            </div>
+            <div style="padding:16px" id="dash-recent"></div>
+          </div>
+        </div>
+        <div class="dash-tab" id="dtab-my-auctions">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+            <h3 style="font-size:16px;font-weight:700;color:var(--text-1)">All My Listings</h3>
+            <button class="btn btn-primary btn-sm" onclick="openSellForm()">+ New Listing</button>
+          </div>
+          <div id="dash-all-auctions"></div>
+        </div>
+        <div class="dash-tab" id="dtab-my-orders" style="display:none">
+          <h3 style="font-size:16px;font-weight:700;color:var(--text-1);margin-bottom:18px">My Orders</h3>
+          <div id="dash-my-orders"><div class="loading"><span class="spinner"></span></div></div>
+        </div>
+        <div class="dash-tab" id="dtab-seller-orders" style="display:none">
+          <h3 style="font-size:16px;font-weight:700;color:var(--text-1);margin-bottom:18px">Received Orders</h3>
+          <div id="dash-seller-orders"><div class="loading"><span class="spinner"></span></div></div>
+        </div>
+        <div class="dash-tab" id="dtab-profile">
+          <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:26px;max-width:500px">
+            <h3 style="font-size:15px;font-weight:700;color:var(--text-1);margin-bottom:20px">Edit Profile</h3>
+            <div id="profile-alert"></div>
+            <div class="form-group"><label class="form-label">Full Name</label><input class="form-control" id="p-fullname"></div>
+            <div class="form-group"><label class="form-label">Phone</label><input class="form-control" id="p-phone" placeholder="01XXXXXXXXX"></div>
+            <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+          </div>
+        </div>
+        <div class="dash-tab" id="dtab-change-pw">
+          <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:26px;max-width:420px">
+            <h3 style="font-size:15px;font-weight:700;color:var(--text-1);margin-bottom:20px">Change Password</h3>
+            <div id="pw-alert"></div>
+            <div class="form-group"><label class="form-label">Current Password</label><input class="form-control" id="pw-old" type="password"></div>
+            <div class="form-group"><label class="form-label">New Password</label><input class="form-control" id="pw-new" type="password"></div>
+            <div class="form-group"><label class="form-label">Confirm New Password</label><input class="form-control" id="pw-new2" type="password"></div>
+            <button class="btn btn-primary" onclick="changePassword()">Update Password</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- ══ WATCHLIST VIEW ══ -->
+<div id="view-watchlist" class="view">
+  <div class="page-hero">
+    <div class="container page-hero-inner"><h1>❤️ My Watchlist</h1><p>Auctions you're following</p></div>
+  </div>
+  <div class="container">
+    <div class="watchlist-grid" id="watchlist-grid">
+      <div class="loading" style="grid-column:1/-1"><span class="spinner"></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BIDS VIEW ══ -->
+<div id="view-bids" class="view">
+  <div class="page-hero">
+    <div class="container page-hero-inner"><h1>💰 My Bids</h1><p>All sealed bids you've placed</p></div>
+  </div>
+  <div class="container" style="padding:24px 20px">
+    <div id="bids-list"><div class="loading"><span class="spinner"></span></div></div>
+  </div>
+</div>
+
+<!-- ══ CHATS VIEW ══ -->
+<div id="view-chats" class="view">
+  <div class="page-hero">
+    <div class="container page-hero-inner"><h1>💬 Messages</h1><p>Post-auction conversations</p></div>
+  </div>
+  <div class="container">
+    <div class="chat-layout" id="chat-layout">
+      <div class="chat-sidebar">
+        <div class="chat-sidebar-head">Conversations</div>
+        <div id="chat-list-items"><div class="loading" style="padding:20px;font-size:12px"><span class="spinner"></span></div></div>
+      </div>
+      <div class="chat-thread" id="chat-thread">
+        <div class="chat-empty">
+          <div class="ico">💬</div>
+          <h3 style="font-size:15px;font-weight:700;color:var(--text-2);margin-bottom:6px">No chat selected</h3>
+          <p>Select a conversation from the left, or win an auction to start chatting.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ NOTIFICATIONS VIEW ══ -->
+<div id="view-notifications" class="view">
+  <div class="page-hero">
+    <div class="container page-hero-inner"><h1>🔔 Notifications</h1></div>
+  </div>
+  <div class="container" style="padding:24px 20px;max-width:700px">
+    <div id="notif-full-list"><div class="loading"><span class="spinner"></span></div></div>
+  </div>
+</div>
+
+<!-- ══ TRUST STRIP ══ -->
+<div class="trust-strip">
+  <div class="container">
+    <div class="trust-inner">
+      <div class="trust-item"><div class="ico">🔒</div><div><h4>Sealed Bids</h4><p>No one sees your amount</p></div></div>
+      <div class="trust-item"><div class="ico">🛒</div><div><h4>Buy Now</h4><p>Instant purchase on new items</p></div></div>
+      <div class="trust-item"><div class="ico">💬</div><div><h4>Winner Chat</h4><p>Secure post-auction messaging</p></div></div>
+      <div class="trust-item"><div class="ico">🇧🇩</div><div><h4>Bangladesh</h4><p>All prices in Taka (৳)</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="logo-icon">♻️</div>
+          <span class="logo-text">Recycle<span>BD</span></span>
+        </div>
+        <p>Bangladesh's trusted marketplace & sealed-bid auction platform. Buy new items instantly or bid on quality used goods.</p>
+      </div>
+      <div class="footer-col"><h4>Platform</h4><ul>
+        <li><a onclick="nav('home')">Home</a></li>
+        <li><a onclick="nav('auctions')">Browse Items</a></li>
+        <li><a onclick="openSellForm()">Sell an Item</a></li>
+        <li><a onclick="nav('dashboard')">Dashboard</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Categories</h4><ul>
+        <li><a onclick="nav('auctions','category=Phones')">Phones</a></li>
+        <li><a onclick="nav('auctions','category=Laptops')">Laptops</a></li>
+        <li><a onclick="nav('auctions','category=Cameras')">Cameras</a></li>
+        <li><a onclick="nav('auctions','category=Watches')">Watches</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Cities</h4><ul>
+        <li><a onclick="nav('auctions','city=Dhaka')">Dhaka</a></li>
+        <li><a onclick="nav('auctions','city=Chittagong')">Chittagong</a></li>
+        <li><a onclick="nav('auctions','city=Rajshahi')">Rajshahi</a></li>
+        <li><a onclick="nav('auctions','city=Sylhet')">Sylhet</a></li>
+      </ul></div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="container footer-bottom-inner">
+      <span>© 2025 RecycleBD. All rights reserved. Made with ❤️ in Bangladesh 🇧🇩</span>
+      <div class="footer-badges">
+        <span class="footer-badge">🔒 SSL Secured</span>
+        <span class="footer-badge">🇧🇩 Local Platform</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ══ AUTH MODAL ══ -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>♻️ Welcome to RecycleBD</h3>
+      <button class="modal-close" onclick="closeModal('auth-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('login',this)">Sign In</button>
+        <button class="auth-tab" onclick="switchAuthTab('register',this)">Create Account</button>
+      </div>
+      <div class="form-section active" id="form-login">
+        <div id="login-alert"></div>
+        <div class="form-group"><label class="form-label">Email Address</label><input class="form-control" id="l-email" type="email" placeholder="you@example.com"></div>
+        <div class="form-group"><label class="form-label">Password</label><input class="form-control" id="l-pass" type="password" placeholder="Your password"></div>
+        <button class="btn btn-primary btn-block" id="login-btn" onclick="doLogin()">Sign In →</button>
+        <div class="demo-hint">
+          <strong>Demo accounts:</strong><br>
+          User: rahim@example.com / seller123<br>
+          Admin: admin@recycledigi.com / admin123
+        </div>
+      </div>
+      <div class="form-section" id="form-register">
+        <div id="reg-alert"></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Username *</label><input class="form-control" id="r-username" placeholder="john_doe"></div>
+          <div class="form-group"><label class="form-label">Full Name</label><input class="form-control" id="r-fullname" placeholder="John Doe"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Email *</label><input class="form-control" id="r-email" type="email" placeholder="you@example.com"></div>
+        <div class="form-group"><label class="form-label">Phone</label><input class="form-control" id="r-phone" placeholder="01XXXXXXXXX"></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Password *</label><input class="form-control" id="r-pass" type="password" placeholder="Min 6 chars"></div>
+          <div class="form-group"><label class="form-label">Confirm *</label><input class="form-control" id="r-pass2" type="password" placeholder="Repeat"></div>
+        </div>
+        <button class="btn btn-primary btn-block" id="reg-btn" onclick="doRegister()">Create Account →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BID MODAL ══ -->
+<div class="modal-overlay" id="bid-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>🔒 Place Sealed Bid</h3>
+      <button class="modal-close" onclick="closeModal('bid-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-info">🔒 <strong>Sealed bid:</strong> Your amount is hidden from everyone until the auction ends. Highest bid wins.</div>
+      <div class="bid-modal-auction" id="bid-modal-info"></div>
+      <div id="bid-alert"></div>
+      <div class="bid-form-wrap">
+        <div class="bid-form-label">Your Bid Amount <span id="bid-min-hint" style="color:var(--primary-light);font-size:11px"></span></div>
+        <div class="bid-input-row">
+          <div class="bid-sym">৳</div>
+          <input type="number" class="bid-input" id="bid-amount-input" placeholder="Enter amount">
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block btn-lg" onclick="submitBid()" id="bid-submit-btn">🔒 Place Sealed Bid</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CHECKOUT MODAL ══ -->
+<div class="modal-overlay" id="checkout-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📦 Checkout</h3>
+      <button class="modal-close" onclick="closeModal('checkout-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="checkout-alert"></div>
+      <div class="form-group"><label class="form-label">Delivery Address *</label><textarea class="form-control" id="co-address" rows="3" placeholder="Full delivery address"></textarea></div>
+      <div class="form-group"><label class="form-label">Phone *</label><input class="form-control" id="co-phone" placeholder="01XXXXXXXXX"></div>
+      <div class="form-group"><label class="form-label">Note (optional)</label><input class="form-control" id="co-note" placeholder="Any special instructions"></div>
+      <div id="checkout-summary" style="margin-bottom:16px;font-size:13px;color:var(--text-2)"></div>
+      <button class="btn btn-primary btn-block btn-lg" onclick="placeOrder()" id="checkout-btn">📦 Place Order</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EDIT MODAL ══ -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>✏️ Edit Auction</h3>
+      <button class="modal-close" onclick="closeModal('edit-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="edit-alert"></div>
+      <div class="form-group"><label class="form-label">Title</label><input class="form-control" id="e-title"></div>
+      <div class="form-group"><label class="form-label">Description</label><textarea class="form-control" id="e-desc" rows="3"></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Base Price (৳)</label><input class="form-control" id="e-base" type="number"></div>
+        <div class="form-group"><label class="form-label">Bid Increment (৳)</label><input class="form-control" id="e-increment" type="number"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">City</label>
+          <select class="form-control" id="e-city">
+            <option>Dhaka</option><option>Chittagong</option><option>Rajshahi</option><option>Khulna</option><option>Sylhet</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">End Date/Time</label><input class="form-control" id="e-ends" type="datetime-local"></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-primary" onclick="saveEdit()" id="edit-save-btn">Save Changes</button>
+        <button class="btn btn-ghost" onclick="closeModal('edit-modal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>
